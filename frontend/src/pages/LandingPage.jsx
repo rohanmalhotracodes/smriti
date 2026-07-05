@@ -18,7 +18,7 @@ export default function LandingPage({ navigate }) {
 				<div className="ld-nav-links">
 					<a href="#how">How it works</a>
 					<a href="#memory">Memory layer</a>
-					<a href="https://github.com/rohanmalhotracodes/crewmind-cloud" target="_blank" rel="noreferrer">GitHub</a>
+					<a href="https://github.com/rohanmalhotracodes/smriti" target="_blank" rel="noreferrer">GitHub</a>
 					<a href="/console" className="btn btn--primary ld-nav-cta" onClick={openConsole}>Open Console</a>
 				</div>
 			</nav>
@@ -35,7 +35,7 @@ export default function LandingPage({ navigate }) {
 				</p>
 				<div className="ld-cta-row">
 					<a href="/console" className="btn btn--primary ld-cta" onClick={openConsole}>Open the dispatch console →</a>
-					<a href="https://github.com/rohanmalhotracodes/crewmind-cloud" target="_blank" rel="noreferrer" className="btn ld-cta">View source</a>
+					<a href="https://github.com/rohanmalhotracodes/smriti" target="_blank" rel="noreferrer" className="btn ld-cta">View source</a>
 				</div>
 				<div className="ld-stats">
 					<div className="ld-stat"><strong>4</strong><span>memory operations<br />remember · recall · improve · forget</span></div>

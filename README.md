@@ -101,7 +101,7 @@ FastAPI backend (:8000)
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/rohanmalhotracodes/crewmind-cloud.git
+git clone https://github.com/rohanmalhotracodes/smriti.git
 cd crewmind-cloud
 
 make setup
