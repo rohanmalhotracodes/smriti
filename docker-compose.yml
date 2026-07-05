@@ -1,0 +1,46 @@
+# Smriti — single-container app (built SPA + FastAPI) + Postgres.
+#
+# Run regular:  make up        (or: docker compose up --build)
+# Run demo:     make demo      (or: IS_DEMO=true docker compose up --build)
+#
+# Browse: http://localhost:8080
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: smriti-postgres
+    environment:
+      POSTGRES_USER: smriti
+      POSTGRES_PASSWORD: smriti
+      POSTGRES_DB: smriti
+    ports:
+      - "5432:5432"   # published for local (non-Docker) backend dev
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smriti"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smriti-app
+    environment:
+      DATABASE_URL: postgresql+asyncpg://smriti:smriti@postgres:5432/smriti
+      IS_DEMO: ${IS_DEMO:-false}
+      API_HOST: 0.0.0.0
+      API_PORT: "8000"
+      API_RELOAD: "false"
+      CORS_ORIGINS: '["*"]'
+      LOG_LEVEL: INFO
+    ports:
+      - "8080:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
