@@ -45,6 +45,9 @@ export const api = {
 	rememberOverride: (jobId, data) => apiClient.post(`/memory/jobs/${jobId}/override`, data, { timeout: 300000 }),
 	forgetCustomer: (customerName) => apiClient.post('/memory/customers/forget', { customer_name: customerName, confirm: true }, { timeout: 300000 }),
 	memoryEvents: (limit = 12) => apiClient.get('/memory/events', { params: { limit } }),
+
+	// Demo-day reset — reseeds dispatch data, keeps Cognee memory
+	demoReset: () => apiClient.post('/demo/reset', {}, { timeout: 120000 }),
 };
 
 export default api;

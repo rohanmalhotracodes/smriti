@@ -50,7 +50,6 @@ export default function ContextMenu({
 		const isCompleted = data.status === 'completed';
 		const isCancelled = data.status === 'cancelled';
 		const hasMultiSelect = selectedJobIds.length > 1 && selectedJobIds.includes(data.id);
-		const multiAssignedIds = hasMultiSelect ? selectedJobIds : [];
 
 		return (
 			<div ref={menuRef} className="ctx-menu" style={{ left: x, top: y }} onClick={(e) => e.stopPropagation()}>

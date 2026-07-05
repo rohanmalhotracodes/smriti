@@ -70,6 +70,10 @@ export default function Dashboard({ onBrandClick }) {
 	/* ── Autoroute confirmation ───────────────────────────── */
 	const [autoRouteConfirm, setAutoRouteConfirm] = useState(false);
 
+	/* ── Reset day confirmation ───────────────────────────── */
+	const [resetConfirm, setResetConfirm] = useState(false);
+	const [resetting, setResetting] = useState(false);
+
 	/* ── Context menu ─────────────────────────────────────── */
 	const [ctxMenu, setCtxMenu] = useState(null);
 
@@ -332,6 +336,24 @@ export default function Dashboard({ onBrandClick }) {
 		}
 	}, [loadData, toast]);
 
+	/* ── Reset day (reseeds dispatch data, keeps Cognee memory) ── */
+	const handleResetDay = useCallback(async () => {
+		setResetConfirm(false);
+		setResetting(true);
+		try {
+			const res = await api.demoReset();
+			setMemoryJob(null);
+			insightsRef.current = {};
+			setSelJobs([]); setSelTechs([]);
+			toast(res.data.message, 'success');
+			await loadData(true);
+		} catch (e) {
+			toast(e.response?.data?.detail || 'Reset failed', 'error');
+		} finally {
+			setResetting(false);
+		}
+	}, [toast, loadData]);
+
 	/* ── Auto-route ───────────────────────────────────────── */
 	const handleAutoRoute = useCallback(async () => {
 		setAutoRouting(true);
@@ -549,6 +571,7 @@ export default function Dashboard({ onBrandClick }) {
 						}}
 					><BrainBtnIcon /><span className="btn-label">Memory</span></button>
 					<button className="btn" onClick={() => loadData(true)} disabled={refreshing}><RefreshIcon spinning={refreshing} /><span className="btn-label">Refresh</span></button>
+					<button className="btn" title="Reset the dispatch day (keeps Cognee memory)" onClick={() => setResetConfirm(true)} disabled={resetting}><ResetIcon spinning={resetting} /><span className="btn-label">{resetting ? 'Resetting…' : 'Reset Day'}</span></button>
 					<button className="btn btn--warning" onClick={() => setAutoRouteConfirm(true)} disabled={autoRouting || pending === 0}>
 						<BoltIcon /><span className="btn-label">{autoRouting ? 'Routing...' : `Auto-Route ${pending}`}</span>
 					</button>
@@ -677,6 +700,23 @@ export default function Dashboard({ onBrandClick }) {
 				</div>
 			)}
 
+			{/* ══ Reset Day Confirmation ══ */}
+			{resetConfirm && (
+				<div className="override-overlay" onClick={() => setResetConfirm(false)}>
+					<div className="override-modal" onClick={(e) => e.stopPropagation()}>
+						<div className="override-title">Reset the dispatch day?</div>
+						<div className="override-body">
+							Wipes and re-seeds today's technicians and jobs (fresh Delhi NCR day).
+							<br /><strong>Cognee memory is kept</strong> — everything Smriti has learned survives the reset.
+						</div>
+						<div className="override-actions">
+							<button className="btn btn--sm" onClick={() => setResetConfirm(false)}>Cancel</button>
+							<button className="btn btn--sm btn--warning" onClick={handleResetDay}>↺ Reset Day</button>
+						</div>
+					</div>
+				</div>
+			)}
+
 			{/* ══ Override Warning (skill/route) ══ */}
 			{overrideWarning && (
 				<div className="override-overlay" onClick={() => setOverrideWarning(null)}>
@@ -757,6 +797,7 @@ function DI({ active, onClick, count, color, label }) {
 /* ── Icons ─────────────────────────────────────────────── */
 function RefreshIcon({ spinning }) { return <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={spinning ? { animation: 'spin 0.8s linear infinite' } : undefined}><path d="M2.5 8a5.5 5.5 0 019.3-4M13.5 8a5.5 5.5 0 01-9.3 4" /><path d="M11.5 1v3h3M4.5 15v-3h-3" /></svg>; }
 function BoltIcon() { return <svg viewBox="0 0 16 16" fill="currentColor"><path d="M9.5 1L3 9h4.5L6.5 15 13 7H8.5z" /></svg>; }
+function ResetIcon({ spinning }) { return <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={spinning ? { animation: 'spin 0.8s linear infinite' } : undefined}><path d="M13.5 8A5.5 5.5 0 1 1 8 2.5c2 0 3.8 1.1 4.8 2.7" /><path d="M13 1.5v4h-4" /></svg>; }
 function BrainBtnIcon() { return <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3"><path d="M6 2.5a2 2 0 00-2 2c-1 .3-1.7 1.2-1.7 2.3 0 .6.2 1.1.5 1.5-.3.4-.5.9-.5 1.5 0 1.2 1 2.2 2.2 2.2H6M6 2.5c.8 0 1.5.7 1.5 1.5v8c0 .8-.7 1.5-1.5 1.5M10 2.5a2 2 0 012 2c1 .3 1.7 1.2 1.7 2.3 0 .6-.2 1.1-.5 1.5.3.4.5.9.5 1.5 0 1.2-1 2.2-2.2 2.2H10M10 2.5c-.8 0-1.5.7-1.5 1.5v8c0 .8.7 1.5 1.5 1.5" /></svg>; }
 function PlusIcon() { return <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M8 2.5v11M2.5 8h11" /></svg>; }
 function PersonPlusIcon() { return <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="6.5" cy="5" r="2.5" /><path d="M2 14c0-2.6 2-4.7 4.5-4.7S11 11.4 11 14" /><path d="M12.5 5.5v4M10.5 7.5h4" /></svg>; }
