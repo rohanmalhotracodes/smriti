@@ -5,6 +5,11 @@ dispatch platform for Indian operations. Its decision layer is powered by
 **[Cognee Cloud](https://www.cognee.ai)** — every job teaches the system,
 and every routing decision recalls what actually happened last time.
 
+**"Smriti turns dispatch from a one-time optimization problem into an
+operational memory system. It does not just route the nearest technician; it
+remembers what actually happened last time."**
+
+
 > Built for the Cognee **"The Hangover Part AI"** hackathon —
 > **Best Use of Cognee Cloud** track.
 
@@ -188,61 +193,6 @@ touches the Cognee memory.
 
 ---
 
-## Live demo runbook (~2 minutes)
-
-Prerequisite: memory seeded (above); the backend startup log shows
-`🧠 Cognee memory layer connected`. The flow is the product's real
-dispatcher workflow — no demo buttons.
-
-1. **A VIP ticket comes in.** Click **+ New Job** → customer:
-   *MetroCare Tower* → issue: *HVAC failure (electrical)* → priority:
-   *VIP / Emergency* → symptoms: *"Server room temperature rising; previous
-   cooling issue returned"* → **Create job**.
-2. The job lands in the grid as priority-1 pending — and the **Memory
-   Insight panel opens automatically** as part of intake, running a live
-   `cognee.recall()`.
-3. Say: *"Any normal dispatch system sends **Aman Singh** — closest
-   qualified, 2.3 km."* The panel disagrees: *"Base router would choose
-   Aman Singh. Smriti recommends Meera Iyer."*
-4. Walk the panel top-to-bottom:
-   - **Repeat Issue / Access Risk / VIP Priority** badges
-   - *Why memory changed the route* — the recalled evidence
-   - Technician comparison with the ±point scoring breakdown
-     (Aman: overruns, poor rating, temporary fix · Meera: similar wins,
-     site familiarity)
-   - Suggested dispatcher note: *"Call basement security desk before
-     arrival; ask for server room access card."*
-5. Click **Assign Meera** — or drag the job onto Aman's row instead to
-   trigger the *"Why are you overriding?"* modal (the reason is remembered
-   by Cognee and scored against the job's real outcome later).
-6. Right-click the job → **Complete** → outcome form (54 min, permanent fix,
-   ★5) → toast: *"Cognee learned from this job."*
-7. Memory panel → **Privacy** → **Forget customer memory** — live
-   `cognee.forget()` deletes MetroCare's dataset; anonymized aggregate
-   patterns survive.
-
-Close with: *"Smriti doesn't just route the nearest technician — it
-remembers what actually happened last time."*
-
-Also worth showing: **+ Add Technician** onboards a new tech (skills,
-coverage areas, shift) — on a VIP job, memory flags them as unproven
-(−15) until they build history.
-
----
-
-## Troubleshooting
-
-| Symptom | Fix |
-|---|---|
-| `SSL: CERTIFICATE_VERIFY_FAILED` calling Cognee | Handled automatically (the app points Python at certifi's CA bundle). If it recurs: `export SSL_CERT_FILE=$(.venv/bin/python -c "import certifi; print(certifi.where())")` |
-| `Cognee operation failed … 404 Not Found` | Your `COGNEE_CLOUD_URL` points at the management API — leave it as `https://api.aws.cognee.ai`; the backend auto-discovers your tenant instance. Restart the backend after editing `.env`. |
-| Memory endpoints return 503 | `COGNEE_API_KEY` missing, or the backend was started before you added it — edit `.env`, restart the backend. |
-| `Connection refused` to Postgres | `make db` (Docker Desktop must be running), or switch to the SQLite `DATABASE_URL`. |
-| Port already in use | `pkill -f "uvicorn backend.api.main"` / `pkill -f vite`, then `make dev`. |
-| Memory button says "Select a job first" | Click a job row in the grid, then **Memory**. (It opens automatically after creating a job.) |
-
----
-
 ## API reference (memory layer)
 
 | Method | Endpoint | Purpose |
@@ -277,7 +227,7 @@ background; the `memory_events` table is a local audit trail of every call.
 | `COGNEE_API_KEY` | Cognee Cloud API key | — |
 | `COGNEE_CLOUD_URL` | Cognee Cloud management/instance URL | `https://api.aws.cognee.ai` |
 
-## Why this is a strong use of Cognee Cloud
+## Use of Cognee Cloud
 
 Smriti treats Cognee as the **decision layer**, not a chatbot bolt-on. The
 full memory lifecycle maps to product moments a dispatcher actually lives:
@@ -290,15 +240,13 @@ full memory lifecycle maps to product moments a dispatcher actually lives:
 | `cognee.improve()` | After every completion, the outcome (actual duration, rating, fix type) consolidates the knowledge graph |
 | `cognee.forget()` | The privacy flow — deletes one customer's dataset while the anonymized ops-patterns dataset survives |
 
-Design choices that make the memory layer trustworthy:
+Design choices for the memory layer:
 
 - **Two-tier datasets** — full detail in `crewmind_customer_<slug>`,
   anonymized copies in `crewmind_ops_patterns`, so *forget* honors the
   customer without losing aggregate learning
 - **No black box** — every recommendation ships its recalled evidence and
   per-modifier point breakdown in the UI
-- **No fake fallback** — without Cognee credentials the memory API returns a
-  configuration error; the memory features are real or absent
 - **Local audit trail** (`memory_events`) — every remember/improve/forget
   call is inspectable
 
@@ -374,6 +322,3 @@ MIT — see [LICENSE](./LICENSE).
 
 ---
 
-**"Smriti turns dispatch from a one-time optimization problem into an
-operational memory system. It does not just route the nearest technician; it
-remembers what actually happened last time."**
