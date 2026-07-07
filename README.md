@@ -42,7 +42,7 @@ issue returned."*
 | Pick | **Aman Singh** — 2.3 km, closest qualified | **Meera Iyer** — 5.9 km |
 | Why | Distance + skills only | Cognee recalls: Aman **overran 3 similar HVAC jobs** in Cyber City and his last MetroCare fix was **temporary (★2)**. Meera fixed **5 similar Cyber City HVAC jobs**, knows this site, and knows to **call basement security before 11 AM** to avoid the site's access delays. |
 
-![Memory Insight panel](assets/crewmind-memory-panel.png)
+![Memory Insight panel](assets/smriti-memory-panel.png)
 *Job intake: the dispatcher creates the ticket via **+ New Job** and the
 Memory Insight panel opens with live Cognee recall — base router picks Aman
 Singh; memory recommends Meera Iyer, with the full scoring breakdown.*
@@ -73,8 +73,8 @@ FastAPI backend (:8000)
 
 **Cognee dataset layout** (enables the privacy story):
 
-- `crewmind_ops_patterns` — anonymized operational patterns (site redacted)
-- `crewmind_customer_<slug>` — full customer/site-specific memories; the
+- `ops_patterns` (shared, anonymized) — anonymized operational patterns (site redacted)
+- `customer_<slug>` — full customer/site-specific memories; the
   forget demo deletes exactly this dataset
 
 **Memory scoring model** (applied on top of the base distance score):
@@ -107,7 +107,7 @@ FastAPI backend (:8000)
 
 ```bash
 git clone https://github.com/rohanmalhotracodes/smriti.git
-cd crewmind-cloud
+cd smriti
 
 make setup
 # = python3 -m venv .venv
@@ -148,7 +148,7 @@ make db          # docker compose up -d postgres  (publishes localhost:5432)
 **Option B — SQLite, zero dependencies:** edit `.env`:
 
 ```bash
-DATABASE_URL=sqlite:///./crewmind.db
+DATABASE_URL=sqlite:///./smriti.db
 ```
 
 Tables are created automatically on first start.
@@ -222,7 +222,7 @@ background; the `memory_events` table is a local audit trail of every call.
 
 | Variable | Purpose | Default |
 |---|---|---|
-| `DATABASE_URL` | PostgreSQL or `sqlite:///./crewmind.db` | Postgres on localhost |
+| `DATABASE_URL` | PostgreSQL or `sqlite:///./smriti.db` | Postgres on localhost |
 | `COGNEE_ENABLED` | Activates the memory layer | `true` in `.env.example` |
 | `COGNEE_API_KEY` | Cognee Cloud API key | — |
 | `COGNEE_CLOUD_URL` | Cognee Cloud management/instance URL | `https://api.aws.cognee.ai` |
@@ -242,8 +242,8 @@ full memory lifecycle maps to product moments a dispatcher actually lives:
 
 Design choices for the memory layer:
 
-- **Two-tier datasets** — full detail in `crewmind_customer_<slug>`,
-  anonymized copies in `crewmind_ops_patterns`, so *forget* honors the
+- **Two-tier datasets** — full detail in `customer_<slug>`,
+  anonymized copies in `ops_patterns` (shared, anonymized), so *forget* honors the
   customer without losing aggregate learning
 - **No black box** — every recommendation ships its recalled evidence and
   per-modifier point breakdown in the UI
@@ -272,7 +272,7 @@ Design choices for the memory layer:
 ### Why forget doesn't hurt future routing
 
 Erasure deletes what identifies the customer (their dataset:
-`crewmind_customer_<slug>`). The anonymized ops dataset keeps the
+`customer_<slug>`). The anonymized ops dataset keeps the
 operational learning — "Meera resolves Cyber City HVAC compressor jobs
 permanently" survives with the site redacted. Compliance and intelligence
 are not in conflict: you lose *whose server room it was*, not *what your
